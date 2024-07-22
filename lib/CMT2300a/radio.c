@@ -22,9 +22,9 @@
 
 #include "radio.h"
 #include "cmt2300a_hal.h"
-#include "cmt2300a_params.h"
-
-#define INFINITE 0
+//#include "cmt2300a_params_tuya.h"
+//#include "cmt2300a_params_easy.h"
+#include "cmt2300a_params_captured.h"
 
 static EnumRFStatus g_nNextRFState = RF_STATE_IDLE;
 static uint8_t* g_pRxBuffer = NULL;
@@ -71,7 +71,7 @@ int RF_Init(void)
     }
 	
 	CMT2300A_GoStby();
-	CMT2300A_ConfigGpio(CMT2300A_GPIO1_SEL_DCLK |CMT2300A_GPIO3_SEL_INT2 |CMT2300A_GPIO2_SEL_DOUT);
+	CMT2300A_ConfigGpio(CMT2300A_GPIO1_SEL_INT1 |CMT2300A_GPIO2_SEL_INT2 |CMT2300A_GPIO3_SEL_DOUT);
 	CMT2300A_ConfigInterrupt(CMT2300A_INT_SEL_RX_FIFO_TH, // /* Config INT1 */
 		                         CMT2300A_INT_SEL_PKT_OK); //  /* Config INT2 */
 	/* Must clear FIFO after enable SPI to read or write the FIFO */
@@ -110,10 +110,10 @@ void RF_Config(void)
     /* Enable interrupt */
     CMT2300A_EnableInterrupt(
         CMT2300A_MASK_TX_DONE_EN  |
-//        CMT2300A_MASK_PREAM_OK_EN |
-//        CMT2300A_MASK_SYNC_OK_EN  |
-//        CMT2300A_MASK_NODE_OK_EN  |
-//        CMT2300A_MASK_CRC_OK_EN   |
+        CMT2300A_MASK_PREAM_OK_EN |
+        CMT2300A_MASK_SYNC_OK_EN  |
+        CMT2300A_MASK_NODE_OK_EN  |
+        CMT2300A_MASK_CRC_OK_EN   |
         CMT2300A_MASK_PKT_DONE_EN
         );
     
@@ -121,9 +121,9 @@ void RF_Config(void)
     CMT2300A_EnableLfosc(false);
     
     /* Use a single 64-uint8_t FIFO for either Tx or Rx */
-    CMT2300A_EnableFifoMerge(true);
+    //FIXME CMT2300A_EnableFifoMerge(true);
     
-    CMT2300A_SetFifoThreshold(32);
+    //FIXME CMT2300A_SetFifoThreshold(32);
     
     /* This is optional, only needed when using Rx fast frequency hopping */
     /* See AN142 and AN197 for details */
@@ -204,7 +204,7 @@ EnumRFResult RF_Process(void)
 #ifdef ENABLE_ANTENNA_SWITCH
         if(CMT2300A_MASK_PKT_OK_FLG & CMT2300A_ReadReg(CMT2300A_CUS_INT_FLAG))  /* Read PKT_OK flag */
 #else
-        if(CMT2300A_ReadGpio2())  /* Read INT2, PKT_OK */
+        if(CMT2300A_ReadGpio1())  /* Read INT1, PKT_OK */
 #endif
         {
             g_nNextRFState = RF_STATE_RX_DONE;
@@ -271,7 +271,7 @@ EnumRFResult RF_Process(void)
 #ifdef ENABLE_ANTENNA_SWITCH
         if(CMT2300A_MASK_TX_DONE_FLG & CMT2300A_ReadReg(CMT2300A_CUS_INT_CLR1))  /* Read TX_DONE flag */
 #else
-        if(CMT2300A_ReadGpio1())  /* Read INT1, TX_DONE */
+        if(CMT2300A_ReadGpio2())  /* Read INT2, TX_DONE */
 #endif
         {
             g_nNextRFState = RF_STATE_TX_DONE;

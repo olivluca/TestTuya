@@ -24,6 +24,8 @@
 //#include <ty_typedefs.h>
 #include "cmt2300a.h"
 
+#define INFINITE 0
+
 #ifdef __cplusplus 
 extern "C" { 
 #endif

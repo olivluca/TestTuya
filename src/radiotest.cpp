@@ -90,32 +90,22 @@ void loop() {
 		}
 		if (radioInitOk) {
 
-			RF_Process();
-			radiostate = RF_GetStatus();
-			switch (radiostate) {
-				case RF_STATE_ERROR:
-					stream->println(RadioStateDescr[radiostate]);
+			switch(RF_Process()) {
+				case RF_ERROR:
+					stream->println("ERROR");
 					radioInitOk=false;
 					break;
-				case RF_STATE_RX_TIMEOUT:
-				case RF_STATE_TX_TIMEOUT:
-					stream->println(RadioStateDescr[radiostate]);
+				case RF_RX_TIMEOUT:
+				case RF_TX_TIMEOUT:
+					stream->println("TIMEOUT");
 					break;
-				case RF_STATE_IDLE:
-					RF_StartRx(buf,32,0);
+				case RF_IDLE:
+					RF_StartRx(buf,32,INFINITE);
 					break;
-				case RF_STATE_RX_DONE:
-				    //stream->print(".");
-					bool something=false;
-					for (int i=0; i<32; i++) {
-						if (buf[i]) {
-							stream->print(buf[i]);
-							stream->print(" ");
-							something=true;
-						}
-						if (something)  
-							stream->println("");
-					}
+				case RF_RX_DONE:
+					for (int i=0; i<32; i++)
+						stream->printf("%.2x ",buf[i]);
+					stream->println("");
 					break;
 			}
 		}
