@@ -58,7 +58,8 @@ int RF_Init(void)
     tmp = (~0x07) & CMT2300A_ReadReg(CMT2300A_CUS_CMT10);
     CMT2300A_WriteReg(CMT2300A_CUS_CMT10, tmp|0x02);
     
-	RF_Config();
+	//not done here in this test
+    //RF_Config();
 
 	if(false==CMT2300A_IsExist()) 
 	{
@@ -67,9 +68,10 @@ int RF_Init(void)
     }
     else
 	{
+        return 0;
       //CMT2300A ready RX"
     }
-	
+	// The following instructions aren't used in this test
 	CMT2300A_GoStby();
 	CMT2300A_ConfigGpio(CMT2300A_GPIO1_SEL_INT1 |CMT2300A_GPIO2_SEL_INT2 |CMT2300A_GPIO3_SEL_DOUT);
 	CMT2300A_ConfigInterrupt(CMT2300A_INT_SEL_RX_FIFO_TH, // /* Config INT1 */
@@ -85,6 +87,7 @@ int RF_Init(void)
 	return 0;
 }
 
+//not used in this test
 void RF_Config(void)
 {
 #ifdef ENABLE_ANTENNA_SWITCH
@@ -116,12 +119,11 @@ void RF_Config(void)
         CMT2300A_MASK_CRC_OK_EN   |
         CMT2300A_MASK_PKT_DONE_EN
         );
-    
     /* Disable low frequency OSC calibration */
     CMT2300A_EnableLfosc(false);
     
     /* Use a single 64-uint8_t FIFO for either Tx or Rx */
-    //FIXME CMT2300A_EnableFifoMerge(true);
+    CMT2300A_EnableFifoMerge(true);
     
     //FIXME CMT2300A_SetFifoThreshold(32);
     
@@ -133,21 +135,25 @@ void RF_Config(void)
     CMT2300A_GoSleep();
 }
 
+//not used in this test
 void RF_SetStatus(EnumRFStatus nStatus)
 {
     g_nNextRFState = nStatus;
 }
 
+//not used in this test
 EnumRFStatus RF_GetStatus(void)
 {
     return g_nNextRFState;
 }
 
+//not used in this test
 uint8_t RF_GetInterruptFlags(void)
 {
     return g_nInterrutFlags;
 }
 
+//not used in this test
 void RF_StartRx(uint8_t buf[], uint16_t len, uint32_t timeout)
 {
     g_pRxBuffer = buf;
@@ -159,6 +165,7 @@ void RF_StartRx(uint8_t buf[], uint16_t len, uint32_t timeout)
     g_nNextRFState = RF_STATE_RX_START;
 }
 
+//not used in this test
 void RF_StartTx(uint8_t buf[], uint16_t len, uint32_t timeout)
 {
     g_pTxBuffer = buf;
@@ -168,6 +175,7 @@ void RF_StartTx(uint8_t buf[], uint16_t len, uint32_t timeout)
     g_nNextRFState = RF_STATE_TX_START;
 }
 
+//not used in this test
 EnumRFResult RF_Process(void)
 {
     EnumRFResult nRes = RF_BUSY;

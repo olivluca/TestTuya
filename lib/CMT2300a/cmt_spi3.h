@@ -59,7 +59,9 @@ extern int ty_read_sdio_pin(void);
 
 
 #define CMT2300A_SetGpio1In()      pinMode(CMT2300A_GPIO1_PIN, INPUT)
-#define CMT2300A_SetGpio2In()      pinMode(CMT2300A_GPIO1_PIN, INPUT)
+#define CMT2300A_SetGpio2In()      pinMode(CMT2300A_GPIO2_PIN, INPUT)
+#define CMT2300A_SetGpio1Out()      pinMode(CMT2300A_GPIO1_PIN, OUTPUT)
+#define CMT2300A_SetGpio2Out()      pinMode(CMT2300A_GPIO2_PIN, OUTPUT)
 //#define CMT2300A_SetGpio3In()           ty_set_gpio3_in()
 #define CMT2300A_ReadGpio1()       digitalRead(CMT2300A_GPIO1_PIN)
 #define CMT2300A_ReadGpio2()       digitalRead(CMT2300A_GPIO2_PIN)
