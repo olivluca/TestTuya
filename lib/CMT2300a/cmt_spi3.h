@@ -57,16 +57,6 @@ extern int ty_read_sdio_pin(void);
 #define cmt_spi3_sdio_out()	 pinMode(CMT2300A_SPI_MOSI_PIN, OUTPUT)
 #define cmt_spi3_sdio_read() digitalRead(CMT2300A_SPI_MOSI_PIN)
 
-
-#define CMT2300A_SetGpio1In()      pinMode(CMT2300A_GPIO1_PIN, INPUT)
-#define CMT2300A_SetGpio2In()      pinMode(CMT2300A_GPIO2_PIN, INPUT)
-#define CMT2300A_SetGpio1Out()      pinMode(CMT2300A_GPIO1_PIN, OUTPUT)
-#define CMT2300A_SetGpio2Out()      pinMode(CMT2300A_GPIO2_PIN, OUTPUT)
-//#define CMT2300A_SetGpio3In()           ty_set_gpio3_in()
-#define CMT2300A_ReadGpio1()       digitalRead(CMT2300A_GPIO1_PIN)
-#define CMT2300A_ReadGpio2()       digitalRead(CMT2300A_GPIO2_PIN)
-//#define CMT2300A_ReadGpio3()            ty_read_gpio3_pin()
-
 #define CMT2300A_DelayMs(ms)            delay(ms)
 #define CMT2300A_DelayUs(us)            delayMicroseconds(us)
 #define g_nSysTickCount 				t_nSysTickCount

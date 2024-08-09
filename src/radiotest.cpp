@@ -22,40 +22,13 @@ unsigned long lastmillis;
 
 /* not working yet */
 void receive() {
-    if (RF_Init()==0) {
+    if (StartRx()==0) {
 		stream->println("RF_Init ok");
 	} else {
 	  	stream->println("RF_Init error");
 		return;
 	}
 
-    CMT2300A_ConfigGpio (CMT2300A_GPIO1_SEL_INT1 | CMT2300A_GPIO2_SEL_INT2 | CMT2300A_GPIO3_SEL_DOUT);
-	CMT2300A_ConfigInterrupt(CMT2300A_INT_SEL_TX_DONE, CMT2300A_INT_SEL_PKT_OK);
-	CMT2300A_EnableInterrupt(CMT2300A_MASK_TX_DONE_EN | CMT2300A_MASK_PKT_DONE_EN);
-
-	CMT2300A_WriteReg(CMT2300A_CUS_SYS2 , 0);
-
-	CMT2300A_EnableFifoMerge(true);
-
-	CMT2300A_WriteReg(CMT2300A_CUS_PKT29, 0x20); 
-
-	CMT2300A_GoSleep();
-	CMT2300A_GoStby();
-	CMT2300A_ConfigGpio (CMT2300A_GPIO1_SEL_DCLK | CMT2300A_GPIO2_SEL_DOUT | CMT2300A_GPIO3_SEL_INT2);
-	CMT2300A_ConfigInterrupt(CMT2300A_INT_SEL_SYNC_OK | CMT2300A_INT_SEL_SL_TMO, CMT2300A_INT_SEL_PKT_OK);
-    CMT2300A_EnableFifoMerge(true);
-	CMT2300A_ClearInterruptFlags();
-	CMT2300A_ClearRxFifo();
-	pinMode(CMT2300A_GPIO2_PIN, INPUT);
-	
-    CMT2300A_GoRx();
-
-	//CMT2300_IsExist()
-	int rssi=CMT2300A_GetRssiDBm();
-	//stream->print("rssi dbm ");
-	//stream->println(rssi);
-
-	CMT2300A_ClearInterruptFlags();
 	int lastvalue=LOW;
 	unsigned long lasttime=micros();
 	unsigned long starttime=lasttime;
@@ -92,58 +65,46 @@ void sendbutton(int b) {
 		  /*6*/          {5933,1104,379,1104,379,379,1104,379,1104,379,1104,379,1104,379,1104,379,1104,379,1104,1104,379,1104,379,379,1104,1104,379,1104,379,379,1104,1104,379,379,1104,1104,379,379,1104,1104,379,1104,379,379,1104,1104,379,379,1104,379,1104,1104,379,379,1104,1104,379,379,1104,1104,0},
 	};
 
-    if (RF_Init()==0) {
-		stream->println("RF_Init ok");
-	} else {
-	  	stream->println("RF_Init error");
-		return;
+    switch (StartTx()) {
+		case 1:
+		  stream->println("Error RF_Init");
+		  return;
+		case 2:
+		  stream->println("Error go tx");
+		  return;  
 	}
+
 
     int i=0;
-	pinMode(CMT2300A_GPIO1_PIN, OUTPUT);
 	//start with no tx
     int level=LOW;
-	digitalWrite(CMT2300A_GPIO1_PIN, level);
-    CMT2300A_WriteReg(CMT2300A_CUS_SYS2,0); //???? 
-    CMT2300A_ConfigGpio(CMT2300A_GPIO1_SEL_DOUT | CMT2300A_GPIO3_SEL_DIN | CMT2300A_GPIO2_SEL_INT2);
-	CMT2300A_EnableTxDin(true);    
-	CMT2300A_ConfigTxDin(CMT2300A_TX_DIN_SEL_GPIO1);
-	CMT2300A_EnableTxDinInvert(true);  //don't know why it's needed
-	CMT2300A_GoSleep();
-	CMT2300A_GoStby();
-
-
-    #undef ESPHOME_DELAY
-	if (CMT2300A_GoTx()) {
-		stream->println("go tx ok");
-		#ifdef ESPHOME_DELAY
-		uint32_t current_time = micros();
-		#endif  
-		while (values[b][i]!=0) {
-			level=1-level;
-			digitalWrite(CMT2300A_GPIO1_PIN, level);
-			unsigned long delay=values[b][i];
-			#ifdef ESPHOME_DELAY
-			uint32_t target_time = current_time+delay;
-			while (target_time > micros()) {
-				//busy loop
-			}
-			current_time=target_time;
-			#else
-			delayMicroseconds(delay);
-			#endif
-			i++;
-		}
+    #define ESPHOME_DELAY
+	#ifdef ESPHOME_DELAY
+	stream->println("using esphome delay");
+	uint32_t current_time = micros();
+	#endif  
+	while (values[b][i]!=0) {
 		level=1-level;
-		digitalWrite(CMT2300A_GPIO1_PIN,level);
-		//delay(500);
-		if (CMT2300A_GoStby())
-		stream->println("go stby ok");
-		else
-		stream->println("go stdby error");  
-	} else {
-	  stream->println("go tx error");
+		digitalWrite(CMT2300A_GPIO1_PIN, level);
+		unsigned long delay=values[b][i];
+		#ifdef ESPHOME_DELAY
+		uint32_t target_time = current_time+delay;
+		while (target_time > micros()) {
+			//busy loop
+		}
+		current_time=target_time;
+		#else
+		delayMicroseconds(delay);
+		#endif
+		i++;
 	}
+	level=1-level;
+	digitalWrite(CMT2300A_GPIO1_PIN,level);
+	if (CMT2300A_GoStby())
+		stream->println("go stby ok");
+	else
+		stream->println("go stdby error");  
+	
 }
 
 void setup() {

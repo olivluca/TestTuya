@@ -21,53 +21,14 @@
 #ifndef __RADIO_H
 #define __RADIO_H
 
-//#include <ty_typedefs.h>
 #include "cmt2300a.h"
-
-#define INFINITE 0
 
 #ifdef __cplusplus 
 extern "C" { 
 #endif
 
-/* RF state machine */
-typedef enum {
-    RF_STATE_IDLE = 0,
-    RF_STATE_RX_START,
-    RF_STATE_RX_WAIT,
-    RF_STATE_RX_DONE,
-    RF_STATE_RX_TIMEOUT,
-    RF_STATE_TX_START,
-    RF_STATE_TX_WAIT,
-    RF_STATE_TX_DONE,
-    RF_STATE_TX_TIMEOUT,
-    RF_STATE_ERROR,
-} EnumRFStatus;
-
-/* RF process function results */
-typedef enum {
-    RF_IDLE = 0,
-    RF_BUSY,
-    RF_RX_DONE,
-    RF_RX_TIMEOUT,
-    RF_TX_DONE,
-    RF_TX_TIMEOUT,
-    RF_ERROR,
-} EnumRFResult;
-
-//#define ENABLE_ANTENNA_SWITCH
-
-int RF_Init(void);
-void RF_Config(void);
-
-void RF_SetStatus(EnumRFStatus nStatus);
-EnumRFStatus RF_GetStatus(void);
-uint8_t RF_GetInterruptFlags(void);
-
-void RF_StartRx(uint8_t buf[], uint16_t len, uint32_t timeout);
-void RF_StartTx(uint8_t buf[], uint16_t len, uint32_t timeout);
-
-EnumRFResult RF_Process(void);
+int StartTx(void);
+int StartRx(void);
 
 #ifdef __cplusplus 
 } 

@@ -27,10 +27,6 @@
 * *********************************************************/
 void CMT2300A_InitGpio(void)
 {
-	//CMT2300A_SetGpio1In();
-    //CMT2300A_SetGpio2In();
-    //CMT2300A_SetGpio3In();
-	
     cmt_spi3_init();
 }
 
