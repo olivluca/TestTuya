@@ -75,31 +75,35 @@ void sendbutton(int b) {
 	}
 
 
-    int i=0;
-	//start with no tx
-    int level=LOW;
-    #define ESPHOME_DELAY
-	#ifdef ESPHOME_DELAY
-	stream->println("using esphome delay");
-	uint32_t current_time = micros();
-	#endif  
-	while (values[b][i]!=0) {
-		level=1-level;
-		digitalWrite(CMT2300A_GPIO1_PIN, level);
-		unsigned long delay=values[b][i];
+    delayMicroseconds(4700);
+
+	for (int repeat=0; repeat<7; repeat++) {
+		int i=0;
+		//start with no tx
+		int level=LOW;
+		#define ESPHOME_DELAY
 		#ifdef ESPHOME_DELAY
-		uint32_t target_time = current_time+delay;
-		while (target_time > micros()) {
-			//busy loop
+		//stream->println("using esphome delay");
+		uint32_t current_time = micros();
+		#endif  
+		while (values[b][i]!=0) {
+			digitalWrite(CMT2300A_GPIO1_PIN, level);
+			level=1-level;
+			unsigned long delay=values[b][i];
+			#ifdef ESPHOME_DELAY
+			uint32_t target_time = current_time+delay;
+			while (target_time > micros()) {
+				//busy loop
+			}
+			current_time=target_time;
+			#else
+			delayMicroseconds(delay);
+			#endif
+			i++;
 		}
-		current_time=target_time;
-		#else
-		delayMicroseconds(delay);
-		#endif
-		i++;
 	}
-	level=1-level;
-	digitalWrite(CMT2300A_GPIO1_PIN,level);
+	digitalWrite(CMT2300A_GPIO1_PIN,HIGH);
+	delayMicroseconds(2000);
 	if (CMT2300A_GoStby())
 		stream->println("go stby ok");
 	else

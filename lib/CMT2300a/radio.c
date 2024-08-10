@@ -53,20 +53,20 @@ int RF_Init(void)
 }
 
 int StartTx() {
+ 	pinMode(CMT2300A_GPIO1_PIN, OUTPUT);
+	digitalWrite(CMT2300A_GPIO1_PIN, LOW);
      if (RF_Init()!=0) {
         return 1;
 	}
- 	pinMode(CMT2300A_GPIO1_PIN, OUTPUT);
-	//start with no tx
-	digitalWrite(CMT2300A_GPIO1_PIN, LOW);
     CMT2300A_WriteReg(CMT2300A_CUS_SYS2,0); //???? 
     CMT2300A_ConfigGpio(CMT2300A_GPIO1_SEL_DOUT | CMT2300A_GPIO3_SEL_DIN | CMT2300A_GPIO2_SEL_INT2);
 	CMT2300A_EnableTxDin(true);    
 	CMT2300A_ConfigTxDin(CMT2300A_TX_DIN_SEL_GPIO1);
-	CMT2300A_EnableTxDinInvert(true);  //don't know why it's needed
+	CMT2300A_EnableTxDinInvert(false); 
 	CMT2300A_GoSleep();
 	CMT2300A_GoStby();
 	if (CMT2300A_GoTx()) {
+  	    digitalWrite(CMT2300A_GPIO1_PIN, HIGH);
         return 0;
     } else {
         return 2;
