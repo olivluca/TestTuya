@@ -10,3 +10,5 @@ reliable, works.
 
 Receiving doesn't work yet.
 
+I'm not working on this project anymore, please see the [tuya_rf](https://github.com/olivluca/tuya_rf) repository where I have everything working.
+
